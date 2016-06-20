@@ -1,0 +1,13 @@
+{
+  "name": "broadcaster",
+  "version": "2.1.0",
+  "dependencies": {
+    "convert-hex": "^0.1.0",
+    "convert-string": "^0.1.0",
+    "node-uuid": "^1.4.7",
+    "websocket": "^1.0.23"
+  },
+  "devDependencies": {
+    "nodemon": "^1.9.2"
+  }
+}

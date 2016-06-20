@@ -1,0 +1,25 @@
+<script>
+	(function(){
+		window.generateSignals = function(form){
+			window.ws.send(form['count'].value);
+			return false;
+		};
+
+		var createWebSocket = function(){
+			window.ws = new WebSocket('ws://localhost:8080', 'echo-protocol');
+
+			window.ws.onclose = function(){
+				setTimeout(function(){
+					// Connection has closed so try to reconnect every second.
+					createWebSocket();
+				}, 1000);
+			}
+		};
+		createWebSocket();
+	})();
+</script>
+
+<form onsubmit="return window.generateSignals(this)">
+	<label>Number of signals: <input type="number" name="count" value="30"></label>
+	<input type="submit">
+</form>

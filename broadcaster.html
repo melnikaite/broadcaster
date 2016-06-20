@@ -1,0 +1,76 @@
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="https://code.highcharts.com/stock/4.2.2/highstock.js"></script>
+
+<h3>Sensor1</h3>
+<div id="sensor1" style="width:100%; height:300px;"></div><h3>Sensor2</h3>
+<div id="sensor2" style="width:100%; height:300px;"></div>
+
+<script>
+	$(function(){
+		$('#sensor1').highcharts('StockChart', {
+			rangeSelector: {
+				enabled: false
+			},
+			navigator: {
+				enabled: false
+			},
+			scrollbar: {
+				enabled: false
+			},
+			series: [{
+				name: 'sensor1',
+				data: []
+			}]
+		});
+
+		$('#sensor2').highcharts('StockChart', {
+			rangeSelector: {
+				enabled: false
+			},
+			navigator: {
+				enabled: false
+			},
+			scrollbar: {
+				enabled: false
+			},
+			series: [{
+				name: 'sensor2',
+				data: []
+			}]
+		});
+
+		var createWebSocket = function(){
+			var ws = new WebSocket('ws://localhost:8080', 'echo-protocol');
+
+			ws.addEventListener('message', function(e){
+				var data = JSON.parse(e.data);
+
+				var chart1 = $('#sensor1').highcharts();
+				var series1 = chart1.series[0];
+
+				var chart2 = $('#sensor2').highcharts();
+				var series2 = chart2.series[0];
+
+				for(var i = 0; i < data.length; i += 1){
+					if(series1.xData.indexOf(data[i].timestamp) == -1){
+						series1.addPoint([data[i].timestamp, data[i].sensor1], false, series1.data.length >= 30);
+					}
+					if(series2.xData.indexOf(data[i].timestamp) == -1){
+						series2.addPoint([data[i].timestamp, data[i].sensor2], false, series2.data.length >= 30);
+					}
+				}
+
+				chart1.redraw();
+				chart2.redraw();
+			});
+
+			ws.onclose = function(){
+				setTimeout(function(){
+					// Connection has closed so try to reconnect every second.
+					createWebSocket();
+				}, 1000);
+			};
+		};
+		createWebSocket();
+	});
+</script>
